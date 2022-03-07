@@ -45,7 +45,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
            ]
   end
 
-  test "EEx tag" do
+  test "HEEx tag" do
     text = "<% end %>\n"
 
     assert lex_heex(text) == [
@@ -58,67 +58,18 @@ defmodule Makeup.Lexers.HEExLexerTest do
            ]
   end
 
-  # @tag skip: true
-  test "troublesome case from the Phoenix guides" do
-    # This used to raise an error when lexing the outsider text
-    # when splitting the sequence of tokens based on the byte offset
-    text = """
-    <%= if some_condition? do %>
-      <p>Some condition is true for user: <%= @username %></p>
-    <% else %>
-      <p>Some condition is false for user: <%= @username %></p>
-    <% end %>
-    """
-
-    assert lex_heex(text) == [
-             {:punctuation, %{group_id: "group-1"}, "<%="},
-             {:whitespace, %{}, " "},
-             {:keyword, %{}, "if"},
-             {:whitespace, %{}, " "},
-             {:name, %{}, "some_condition?"},
-             {:whitespace, %{}, " "},
-             {:keyword, %{group_id: "group-ex-1"}, "do"},
-             {:whitespace, %{}, " "},
-             {:punctuation, %{group_id: "group-1"}, "%>"},
-             {:whitespace, %{}, "\n  "},
+  test "HEEx with curly braces" do
+    assert lex_heex("<b {@attrs}></b>") == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},
-             {:keyword, %{}, "p"},
+             {:keyword, %{}, "b"},
+             {:whitespace, %{}, " "},
+             {:punctuation, %{group_id: "group-1"}, "{"},
+             {:name_attribute, %{}, "@attrs"},
+             {:punctuation, %{}, "}"},
              {:punctuation, %{group_id: "group-out-1"}, ">"},
-             {:string, %{}, "Some condition is true for user: "},
-             {:punctuation, %{group_id: "group-2"}, "<%="},
-             {:whitespace, %{}, " "},
-             {:name_attribute, %{}, "@username"},
-             {:whitespace, %{}, " "},
-             {:punctuation, %{group_id: "group-2"}, "%>"},
              {:punctuation, %{group_id: "group-out-2"}, "</"},
-             {:keyword, %{}, "p"},
-             {:punctuation, %{group_id: "group-out-2"}, ">"},
-             {:string, %{}, "\n"},
-             {:punctuation, %{group_id: "group-3"}, "<%"},
-             {:whitespace, %{}, " "},
-             {:keyword, %{group_id: "group-ex-1"}, "else"},
-             {:whitespace, %{}, " "},
-             {:punctuation, %{group_id: "group-3"}, "%>"},
-             {:string, %{}, "\n  "},
-             {:punctuation, %{group_id: "group-out-3"}, "<"},
-             {:keyword, %{}, "p"},
-             {:punctuation, %{group_id: "group-out-3"}, ">"},
-             {:string, %{}, "Some condition is false for user: "},
-             {:punctuation, %{group_id: "group-4"}, "<%="},
-             {:whitespace, %{}, " "},
-             {:name_attribute, %{}, "@username"},
-             {:whitespace, %{}, " "},
-             {:punctuation, %{group_id: "group-4"}, "%>"},
-             {:punctuation, %{group_id: "group-out-4"}, "</"},
-             {:keyword, %{}, "p"},
-             {:punctuation, %{group_id: "group-out-4"}, ">"},
-             {:whitespace, %{}, "\n"},
-             {:punctuation, %{group_id: "group-5"}, "<%"},
-             {:whitespace, %{}, " "},
-             {:keyword, %{group_id: "group-ex-1"}, "end"},
-             {:whitespace, %{}, " "},
-             {:punctuation, %{group_id: "group-5"}, "%>"},
-             {:whitespace, %{}, "\n"}
+             {:keyword, %{}, "b"},
+             {:punctuation, %{group_id: "group-out-2"}, ">"}
            ]
   end
 end

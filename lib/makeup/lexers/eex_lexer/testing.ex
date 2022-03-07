@@ -1,7 +1,13 @@
 defmodule Makeup.Lexers.EExLexer.Testing do
   @moduledoc false
 
-  alias Makeup.Lexers.{EExLexer, ElixirLexer, HTMLLexer}
+  alias Makeup.Lexers.{
+    EExLexer,
+    HEExLexer,
+    ElixirLexer,
+    HTMLLexer
+  }
+
   alias Makeup.Lexer.Postprocess
 
   # These functions have two purposes:
@@ -45,7 +51,7 @@ defmodule Makeup.Lexers.EExLexer.Testing do
   @spec lex_heex(any) :: list
   def lex_heex(text) do
     text
-    |> EExLexer.lex(group_prefix: "group", outer_lexer: HTMLLexer)
+    |> HEExLexer.lex(group_prefix: "group", outer_lexer: HTMLLexer)
     |> Postprocess.token_values_to_binaries()
     |> Enum.map(fn {ttype, meta, value} -> {ttype, Map.delete(meta, :language), value} end)
   end

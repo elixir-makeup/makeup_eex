@@ -1,13 +1,27 @@
 defmodule MakeupEEx.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+
+  @url "https://github.com/elixir-makeup/makeup_eex"
+
   def project do
     [
       app: :makeup_eex,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
+    ]
+  end
+
+  defp package do
+    [
+      name: :makeup_elixir,
+      licenses: ["BSD"],
+      maintainers: ["Tiago Barroso <tmbb@campus.ul.pt>"],
+      links: %{"GitHub" => @url}
     ]
   end
 

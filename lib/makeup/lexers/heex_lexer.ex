@@ -39,9 +39,17 @@ defmodule Makeup.Lexers.HEExLexer do
       parsec({ElixirLexer, :root_element})
     ])
 
+  # Make this more strict!
+  # we're bound to get a number of false positives due to this.
+  # Actually, I should try to find a syntax reference for HEEx
   text_outside_heex =
     times(
-      lookahead_not(string("<%"))
+      lookahead_not(
+        choice([
+          string("<%"),
+          string("{")
+        ])
+      )
       |> utf8_char([]),
       min: 1
     )

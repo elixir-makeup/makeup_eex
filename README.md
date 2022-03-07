@@ -1,11 +1,11 @@
 # MakeupEEx
 
-A [Makeup](https://github.com/elixir-makeup/makeup/) lexer for the JSON language.
+
+A [Makeup](https://github.com/elixir-makeup/makeup/) lexer for the EEx and HEEx languages.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `makeup_eex` to your list of dependencies in `mix.exs`:
+Add `makeup_eex` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -15,7 +15,10 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/makeup_eex>.
+This package provides two lexers:
+
+* `EExLexer` - this lexer is automatically registered for the `eex` and `html_eex` languages
+* `HEExLexer` - this lexer is automatically registered for the `heex` language
+
+
 
