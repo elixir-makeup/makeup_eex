@@ -1,4 +1,8 @@
 defmodule Makeup.Lexers.HEExLexer do
+  @moduledoc """
+  HEEx lexer
+  """
+
   import NimbleParsec
   alias Makeup.Lexer.Combinators, as: C
   import Makeup.Lexer.Groups
@@ -25,7 +29,8 @@ defmodule Makeup.Lexers.HEExLexer do
         lookahead_not(
           choice([
             string("\n"),
-            string("%>")
+            string("%>"),
+            string("}")
           ])
         )
         |> utf8_char([])
@@ -137,7 +142,7 @@ defmodule Makeup.Lexers.HEExLexer do
         [{:punctuation, %{language: :heex}, "{"}]
       ],
       close: [
-        [{:punctuation, %{language: :heex}, ""}]
+        [{:punctuation, %{language: :heex}, "}"}]
       ]
     ],
     heex_comment: [

@@ -65,7 +65,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:whitespace, %{}, " "},
              {:punctuation, %{group_id: "group-1"}, "{"},
              {:name_attribute, %{}, "@attrs"},
-             {:punctuation, %{}, "}"},
+             {:punctuation, %{group_id: "group-1"}, "}"},
              {:punctuation, %{group_id: "group-out-1"}, ">"},
              {:punctuation, %{group_id: "group-out-2"}, "</"},
              {:keyword, %{}, "b"},

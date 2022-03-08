@@ -1,4 +1,8 @@
 defmodule Makeup.Lexers.EExLexer do
+  @moduledoc """
+  EEx lexer
+  """
+
   import NimbleParsec
   alias Makeup.Lexer.Combinators, as: C
   import Makeup.Lexer.Groups

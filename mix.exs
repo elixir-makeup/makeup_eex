@@ -12,13 +12,14 @@ defmodule MakeupEEx.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      description: "(H)EEx lexer for makeup"
     ]
   end
 
   defp package do
     [
-      name: :makeup_elixir,
+      name: :makeup_eex,
       licenses: ["BSD"],
       maintainers: ["Tiago Barroso <tmbb@campus.ul.pt>"],
       links: %{"GitHub" => @url}
@@ -41,9 +42,8 @@ defmodule MakeupEEx.MixProject do
       # Sub-languages
       {:makeup_elixir, "~> 0.16"},
       {:makeup_html, "~> 0.1.0"},
-      # Benchmarking utilities
-      {:benchee, "~> 1.0", only: :dev},
-      {:benchee_markdown, "~> 0.2", only: :dev}
+      # Docs
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false}
     ]
   end
 end
