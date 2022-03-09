@@ -58,6 +58,18 @@ defmodule Makeup.Lexers.HEExLexerTest do
            ]
   end
 
+  test "HEEx tag only" do
+    text = "<% end %>"
+
+    assert lex_heex(text) == [
+             {:punctuation, %{group_id: "group-1"}, "<%"},
+             {:whitespace, %{}, " "},
+             {:keyword, %{}, "end"},
+             {:whitespace, %{}, " "},
+             {:punctuation, %{group_id: "group-1"}, "%>"}
+           ]
+  end
+
   test "HEEx with curly braces" do
     assert lex_heex("<b {@attrs}></b>") == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},
@@ -70,6 +82,33 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:punctuation, %{group_id: "group-out-2"}, "</"},
              {:keyword, %{}, "b"},
              {:punctuation, %{group_id: "group-out-2"}, ">"}
+           ]
+  end
+
+  test "bug from the phoenix guides" do
+    text =
+      ~S[<%= Phoenix.View.render(HelloWeb.PageView, "test.html", message: "Hello from layout!") %>]
+
+    assert lex_heex(text) == [
+             {:punctuation, %{group_id: "group-1"}, "<%="},
+             {:whitespace, %{}, " "},
+             {:name_class, %{}, "Phoenix.View"},
+             {:operator, %{}, "."},
+             {:name, %{}, "render"},
+             {:punctuation, %{group_id: "group-ex-1"}, "("},
+             {:name_class, %{}, "HelloWeb.PageView"},
+             {:punctuation, %{}, ","},
+             {:whitespace, %{}, " "},
+             {:string, %{}, "\"test.html\""},
+             {:punctuation, %{}, ","},
+             {:whitespace, %{}, " "},
+             {:string_symbol, %{}, "message"},
+             {:punctuation, %{}, ":"},
+             {:whitespace, %{}, " "},
+             {:string, %{}, "\"Hello from layout!\""},
+             {:punctuation, %{group_id: "group-ex-1"}, ")"},
+             {:whitespace, %{}, " "},
+             {:punctuation, %{group_id: "group-1"}, "%>"}
            ]
   end
 end

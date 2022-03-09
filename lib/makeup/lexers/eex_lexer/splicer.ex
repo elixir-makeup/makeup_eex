@@ -56,7 +56,9 @@ defmodule Makeup.Lexers.EExLexer.Splicer do
   end
 
   @doc false
-  def chunk_tokens_by_size([], _) do
+
+  # TODO: ensure we're covering all the cases!
+  def chunk_tokens_by_size([], []) do
     []
   end
 
