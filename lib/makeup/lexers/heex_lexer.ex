@@ -69,6 +69,7 @@ defmodule Makeup.Lexers.HEExLexer do
   heex_attrs = C.many_surrounded_by(elixir_expr, "{", "}", :punctuation)
 
   heex_comment = C.string_like("<%#", "%>", [utf8_char([])], :comment)
+  heex_multiline_comment = C.string_like("<%!--", "--%>", [utf8_char([])], :comment)
   heex_escape = C.many_surrounded_by(elixir_expr, "<%%", "%>", :punctuation)
   heex_show = C.many_surrounded_by(elixir_expr, "<%=", "%>", :punctuation)
   heex_pipe = C.many_surrounded_by(elixir_expr, "<%|", "%>", :punctuation)
@@ -81,6 +82,7 @@ defmodule Makeup.Lexers.HEExLexer do
       heex_attrs,
       # EEx expressions
       heex_comment,
+      heex_multiline_comment,
       heex_escape,
       heex_show,
       heex_pipe,
@@ -151,6 +153,14 @@ defmodule Makeup.Lexers.HEExLexer do
       ],
       close: [
         [{:punctuation, %{language: :heex}, "%>"}]
+      ]
+    ],
+    heex_multiline_comment: [
+      open: [
+        [{:punctuation, %{language: :heex}, "<%!--"}]
+      ],
+      close: [
+        [{:punctuation, %{language: :heex}, "--%>"}]
       ]
     ],
     heex_escape: [
