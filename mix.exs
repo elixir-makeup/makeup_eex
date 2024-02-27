@@ -20,7 +20,7 @@ defmodule MakeupEEx.MixProject do
   defp package do
     [
       name: :makeup_eex,
-      licenses: ["BSD"],
+      licenses: ["BSD-2-Clause"],
       maintainers: ["Tiago Barroso <tmbb@campus.ul.pt>"],
       links: %{"GitHub" => @url}
     ]
