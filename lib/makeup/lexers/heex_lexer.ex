@@ -136,20 +136,35 @@ defmodule Makeup.Lexers.HEExLexer do
   defp heex_postprocess([]), do: []
 
   # The HTMLLexer classifies any unknown tag names as "string".
-  # We just assume that they are HEEx components instead and classify them as
-  # name_function instead. We could also check if they start with `.` (-> local function component)
-  # or are a module + function (name_class would fit better) but both use the
-  # same styling, so this is probably good enough for now.
+  # We customize this here to get a nicer highlighting.
   defp heex_postprocess([
          {:punctuation, %{language: :html}, open_or_close} = punctuation,
          {:string, %{language: :html} = attrs, tag_name} | tokens
        ])
        when open_or_close in ["<", "</"] do
-    [
+    tag_tokens =
+      case ElixirLexer.lex(tag_name) do
+        # MyMod.function -> remote component
+        # we use the default formatting for a module + function from the
+        # Elixir lexer (-> :name_class + :operator + :name)
+        [{:name_class, _, _} | _rest] = tokens ->
+          tokens
+
+        # .function -> local component
+        [{:operator, _, "."} | _rest] ->
+          [{:name_function, attrs, tag_name}]
+
+        _ ->
+          # any other tag (HTML5 native tags are classified as :keyword by makeup_html)
+          # but let's just use it for any other tag as well (could be a CustomElement)
+          [{:keyword, attrs, tag_name}]
+      end
+
+    List.flatten([
       punctuation,
-      {:name_function, attrs, tag_name}
+      tag_tokens
       | heex_postprocess(tokens)
-    ]
+    ])
   end
 
   defp heex_postprocess([token | tokens]), do: [token | heex_postprocess(tokens)]
