@@ -40,7 +40,7 @@ defmodule MakeupEEx.MixProject do
       {:makeup, "~> 1.0"},
       {:nimble_parsec, "~> 1.2"},
       # Sub-languages
-      {:makeup_elixir, "~> 0.16 or ~> 1.0"},
+      {:makeup_elixir, "~> 1.0"},
       {:makeup_html, "~> 0.1.0 or ~> 1.0"},
       # Docs
       {:ex_doc, "~> 0.27", only: :dev, runtime: false}
