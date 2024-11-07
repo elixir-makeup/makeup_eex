@@ -68,8 +68,7 @@ defmodule Makeup.Lexers.HEExLexer do
   # The only thing that makes HEEx templates different from EEx templates
   heex_attrs = C.many_surrounded_by(elixir_expr, "{", "}", :punctuation)
 
-  heex_comment = C.string_like("<%#", "%>", [utf8_char([])], :comment)
-  heex_multiline_comment = C.string_like("<%!--", "--%>", [utf8_char([])], :comment)
+  heex_comment = C.string_like("<%!--", "--%>", [], :comment)
   heex_escape = C.many_surrounded_by(elixir_expr, "<%%", "%>", :punctuation)
   heex_show = C.many_surrounded_by(elixir_expr, "<%=", "%>", :punctuation)
   heex_pipe = C.many_surrounded_by(elixir_expr, "<%|", "%>", :punctuation)
@@ -82,7 +81,6 @@ defmodule Makeup.Lexers.HEExLexer do
       heex_attrs,
       # EEx expressions
       heex_comment,
-      heex_multiline_comment,
       heex_escape,
       heex_show,
       heex_pipe,

@@ -50,7 +50,7 @@ defmodule Makeup.Lexers.EExLexer do
     {ttype, Map.put(meta, :outside_text, true), value}
   end
 
-  eex_comment = C.string_like("<%#", "%>", [utf8_char([])], :comment)
+  eex_comment = C.string_like("<%!--", "--%>", [], :comment)
   eex_escape = C.many_surrounded_by(elixir_expr, "<%%", "%>", :punctuation)
   eex_show = C.many_surrounded_by(elixir_expr, "<%=", "%>", :punctuation)
   eex_pipe = C.many_surrounded_by(elixir_expr, "<%|", "%>", :punctuation)

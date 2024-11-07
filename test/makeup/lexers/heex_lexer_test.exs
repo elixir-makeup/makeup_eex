@@ -8,6 +8,14 @@ defmodule Makeup.Lexers.HEExLexerTest do
     assert lex_heex("") == []
   end
 
+  test "deals with comments" do
+    assert lex_heex("hello<%!-- comment --%>world") == [
+             {:string, %{}, "hello"},
+             {:comment, %{}, "<%!-- comment --%>"},
+             {:string, %{}, "world"}
+           ]
+  end
+
   test "EEx inside tag" do
     assert lex_heex("<b><%= @username %></b>") == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},

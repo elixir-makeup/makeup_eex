@@ -37,6 +37,14 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
       assert lex_html_eex("") == []
     end
 
+    test "deals with comments" do
+      assert lex_html_eex("hello<%!-- comment --%>world") == [
+               {:string, %{}, "hello"},
+               {:comment, %{}, "<%!-- comment --%>"},
+               {:string, %{}, "world"}
+             ]
+    end
+
     test "EEx inside tag" do
       assert lex_html_eex("<b><%= @username %></b>") == [
                {:punctuation, %{group_id: "group-out-1"}, "<"},
@@ -87,7 +95,6 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
              ]
     end
 
-    # @tag skip: true
     test "troublesome case from the Phoenix guides" do
       # This used to raise an error when lexing the outsider text
       # when splitting the sequence of tokens based on the byte offset

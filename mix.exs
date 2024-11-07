@@ -1,8 +1,7 @@
 defmodule MakeupEEx.MixProject do
   use Mix.Project
 
-  @version "0.1.2"
-
+  @version "1.0.0"
   @url "https://github.com/elixir-makeup/makeup_eex"
 
   def project do
@@ -29,7 +28,7 @@ defmodule MakeupEEx.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [],
       mod: {Makeup.Lexers.EExLexer.Application, []}
     ]
   end
@@ -37,7 +36,7 @@ defmodule MakeupEEx.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:makeup, "~> 1.0"},
+      {:makeup, "~> 1.2.1 or ~> 1.3"},
       {:nimble_parsec, "~> 1.2"},
       # Sub-languages
       {:makeup_elixir, "~> 1.0"},
