@@ -111,4 +111,71 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:punctuation, %{group_id: "group-1"}, "%>"}
            ]
   end
+
+  test "HEEx sigil" do
+    assert [
+             {:string_sigil, _, "~H\"\"\""},
+             {:whitespace, _, "\n"},
+             {:punctuation, _, "<"},
+             {:keyword, _, "div"},
+             {:whitespace, _, " "},
+             {:name_attribute, _, "class"},
+             {:operator, _, "="},
+             {:string, _, "\"foo\""},
+             {:whitespace, _, " "},
+             {:string, _, "bar"},
+             {:operator, _, "="},
+             {:punctuation, _, "{"},
+             {:name_attribute, _, "@baz"},
+             {:punctuation, _, "}"},
+             {:punctuation, _, ">"},
+             {:string, _, "\n  "},
+             {:punctuation, _, "<"},
+             {:name_class, _, "MyMod"},
+             {:operator, _, "."},
+             {:name, _, "function"},
+             {:whitespace, _, " "},
+             {:string, _, "attr"},
+             {:operator, _, "="},
+             {:string, _, "\"value\""},
+             {:whitespace, _, " "},
+             {:punctuation, _, "/>"},
+             {:whitespace, _, "\n  "},
+             {:punctuation, _, "<"},
+             {:name_function, _, ".local_component"},
+             {:whitespace, _, " "},
+             {:string, _, "data-attr"},
+             {:punctuation, _, ">"},
+             {:string, _, "\n    "},
+             {:punctuation, _, "<"},
+             {:keyword, _, ":myslot"},
+             {:punctuation, _, ">"},
+             {:string, _, "SlotContent"},
+             {:punctuation, _, "</"},
+             {:keyword, _, ":myslot"},
+             {:punctuation, _, ">"},
+             {:string, _, "\n  "},
+             {:punctuation, _, "</"},
+             {:name_function, _, ".local_component"},
+             {:punctuation, _, ">"},
+             {:string, _, "\n"},
+             {:punctuation, _, "</"},
+             {:keyword, _, "div"},
+             {:punctuation, _, ">"},
+             {:whitespace, _, "\n"},
+             {:string_sigil, _, "\"\"\""},
+             {:whitespace, _, "\n"}
+           ] =
+             Makeup.Lexers.ElixirLexer.lex(~S'''
+             ~H"""
+             <div class="foo" bar={@baz}>
+               <MyMod.function attr="value" />
+               <.local_component data-attr>
+                 <:myslot>SlotContent</:myslot>
+               </.local_component>
+             </div>
+             """
+             ''')
+             |> Makeup.Lexer.Postprocess.token_values_to_binaries()
+  end
 end
