@@ -133,6 +133,42 @@ defmodule Makeup.Lexers.HEExLexer do
   @impl Makeup.Lexer
   def postprocess(tokens, _opts \\ []), do: tokens
 
+  defp heex_postprocess([]), do: []
+
+  # The HTMLLexer classifies any unknown tag names as "string".
+  # We customize this here to get a nicer highlighting.
+  defp heex_postprocess([
+         {:punctuation, %{language: :html}, open_or_close} = punctuation,
+         {:string, %{language: :html} = attrs, tag_name} | tokens
+       ])
+       when open_or_close in ["<", "</"] do
+    tag_tokens =
+      case ElixirLexer.lex(tag_name) do
+        # MyMod.function -> remote component
+        # we use the default formatting for a module + function from the
+        # Elixir lexer (-> :name_class + :operator + :name)
+        [{:name_class, _, _} | _rest] = tokens ->
+          tokens
+
+        # .function -> local component
+        [{:operator, _, "."} | _rest] ->
+          [{:name_function, attrs, tag_name}]
+
+        _ ->
+          # any other tag (HTML5 native tags are classified as :keyword by makeup_html)
+          # but let's just use it for any other tag as well (could be a CustomElement)
+          [{:keyword, attrs, tag_name}]
+      end
+
+    List.flatten([
+      punctuation,
+      tag_tokens
+      | heex_postprocess(tokens)
+    ])
+  end
+
+  defp heex_postprocess([token | tokens]), do: [token | heex_postprocess(tokens)]
+
   ###################################################################
   # Step #3: highlight matching delimiters
   ###################################################################
@@ -227,6 +263,7 @@ defmodule Makeup.Lexers.HEExLexer do
 
     # Apply the finishing touches
     all_tokens
+    |> heex_postprocess()
     |> match_groups(group_prefix)
     |> ElixirLexer.match_groups(group_prefix <> "-ex")
   end

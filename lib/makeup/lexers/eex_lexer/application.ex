@@ -7,10 +7,13 @@ defmodule Makeup.Lexers.EExLexer.Application do
   alias Makeup.Lexers.{
     EExLexer,
     HEExLexer,
-    HTMLLexer
+    HTMLLexer,
+    ElixirLexer
   }
 
   def start(_type, _args) do
+    ElixirLexer.register_sigil_lexer("H", HEExLexer)
+
     Registry.register_lexer(EExLexer,
       options: [],
       names: ["eex"],
