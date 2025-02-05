@@ -7,7 +7,6 @@ defmodule Makeup.Lexers.EExLexer.Application do
   alias Makeup.Lexers.{
     EExLexer,
     HEExLexer,
-    HTMLLexer,
     ElixirLexer
   }
 
@@ -21,13 +20,12 @@ defmodule Makeup.Lexers.EExLexer.Application do
     )
 
     Registry.register_lexer(EExLexer,
-      options: [outer_lexer: HTMLLexer],
+      options: [outer_lexer: &MakeupEEx.dynamic_html_lexer/0],
       names: ["html_eex", "html.eex"],
       extensions: ["html.eex"]
     )
 
     Registry.register_lexer(HEExLexer,
-      options: [],
       names: ["heex"],
       extensions: ["heex"]
     )
