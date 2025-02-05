@@ -4,8 +4,7 @@ defmodule Makeup.Lexers.EExLexer.Testing do
   alias Makeup.Lexers.{
     EExLexer,
     HEExLexer,
-    ElixirLexer,
-    HTMLLexer
+    ElixirLexer
   }
 
   alias Makeup.Lexer.Postprocess
@@ -34,8 +33,10 @@ defmodule Makeup.Lexers.EExLexer.Testing do
 
   @spec lex_html(any) :: list
   def lex_html(text) do
+    {lexer, _opts} = Makeup.Registry.get_lexer_by_name("html")
+
     text
-    |> HTMLLexer.lex(group_prefix: "group-out")
+    |> lexer.lex(group_prefix: "group-out")
     |> Postprocess.token_values_to_binaries()
     |> Enum.map(fn {ttype, meta, value} -> {ttype, Map.delete(meta, :language), value} end)
   end
@@ -43,7 +44,10 @@ defmodule Makeup.Lexers.EExLexer.Testing do
   @spec lex_html_eex(any) :: list
   def lex_html_eex(text) do
     text
-    |> EExLexer.lex(group_prefix: "group", outer_lexer: HTMLLexer)
+    |> EExLexer.lex(
+      group_prefix: "group",
+      outer_lexer: fn -> Makeup.Registry.get_lexer_by_name("html") end
+    )
     |> Postprocess.token_values_to_binaries()
     |> Enum.map(fn {ttype, meta, value} -> {ttype, Map.delete(meta, :language), value} end)
   end
@@ -51,7 +55,7 @@ defmodule Makeup.Lexers.EExLexer.Testing do
   @spec lex_heex(any) :: list
   def lex_heex(text) do
     text
-    |> HEExLexer.lex(group_prefix: "group", outer_lexer: HTMLLexer)
+    |> HEExLexer.lex(group_prefix: "group")
     |> Postprocess.token_values_to_binaries()
     |> Enum.map(fn {ttype, meta, value} -> {ttype, Map.delete(meta, :language), value} end)
   end

@@ -181,12 +181,19 @@ defmodule Makeup.Lexers.EExLexer do
       |> ElixirLexer.postprocess([])
 
     all_tokens =
-      if outer_lexer do
-        new_group_prefix = group_prefix <> "-out"
-        outer_opts = Keyword.put(opts, :group_prefix, new_group_prefix)
-        Splicer.lex_outside(tokens, outer_lexer, outer_opts)
-      else
-        tokens
+      case outer_lexer do
+        nil ->
+          tokens
+
+        lexer when is_atom(lexer) ->
+          lex_outer(tokens, lexer, [], group_prefix)
+
+        {lexer, outer_opts} ->
+          lex_outer(tokens, lexer, outer_opts, group_prefix)
+
+        fun when is_function(outer_lexer, 0) ->
+          {lexer, outer_opts} = fun.()
+          lex_outer(tokens, lexer, outer_opts, group_prefix)
       end
 
     case match_groups? do
@@ -198,5 +205,11 @@ defmodule Makeup.Lexers.EExLexer do
       _ ->
         all_tokens
     end
+  end
+
+  defp lex_outer(tokens, outer_lexer, outer_opts, group_prefix) do
+    new_group_prefix = group_prefix <> "-out"
+    outer_opts = Keyword.put(outer_opts, :group_prefix, new_group_prefix)
+    Splicer.lex_outside(tokens, outer_lexer, outer_opts)
   end
 end

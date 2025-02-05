@@ -7,13 +7,7 @@ defmodule Makeup.Lexers.HEExLexer do
   alias Makeup.Lexer.Combinators, as: C
   import Makeup.Lexer.Groups
 
-  # By default we'll use the HTMLLexer, but users can provide
-  # a different HTML lexer
-  alias Makeup.Lexers.{
-    ElixirLexer,
-    HTMLLexer
-  }
-
+  alias Makeup.Lexers.ElixirLexer
   alias Makeup.Lexers.EExLexer.Splicer
 
   @behaviour Makeup.Lexer
@@ -133,7 +127,7 @@ defmodule Makeup.Lexers.HEExLexer do
 
   defp heex_postprocess([]), do: []
 
-  # The HTMLLexer classifies any unknown tag names as "string".
+  # makeup_html's HTMLLexer classifies any unknown tag names as "string".
   # We customize this here to get a nicer highlighting.
   defp heex_postprocess([
          {:punctuation, %{language: :html}, open_or_close} = punctuation,
@@ -163,6 +157,36 @@ defmodule Makeup.Lexers.HEExLexer do
       tag_tokens
       | heex_postprocess(tokens)
     ])
+  end
+
+  # other HTML Lexers (e.g. makeup_syntect) classify opening tags as :name_tag
+  # Treat any tag name as possible HEEx component
+  defp heex_postprocess([
+         {:name_tag, %{language: :html} = attrs, tag_name} | tokens
+       ]) do
+    tag_tokens =
+      case ElixirLexer.lex(tag_name) do
+        # MyMod.function -> remote component
+        # we use the default formatting for a module + function from the
+        # Elixir lexer (-> :name_class + :operator + :name)
+        [{:name_class, _, _} | _rest] = tokens ->
+          tokens
+
+        # .function -> local component
+        [{:operator, _, "."} | _rest] ->
+          [{:name_function, attrs, tag_name}]
+
+        # :name -> slot
+        # we use string_symbol as that is how the `slot :foo` slot declaration
+        # is highlighted in the docs
+        [{:string_symbol, _, [":" | _]} | _rest] ->
+          [{:string_symbol, attrs, tag_name}]
+
+        _ ->
+          [{:name_tag, attrs, tag_name}]
+      end
+
+    tag_tokens ++ heex_postprocess(tokens)
   end
 
   defp heex_postprocess([token | tokens]), do: [token | heex_postprocess(tokens)]
@@ -243,7 +267,7 @@ defmodule Makeup.Lexers.HEExLexer do
   @impl Makeup.Lexer
   def lex(text, opts \\ []) do
     group_prefix = Keyword.get(opts, :group_prefix, random_prefix(10))
-    outer_lexer = Keyword.get(opts, :outer_lexer, HTMLLexer)
+    outer_lexer = Keyword.get(opts, :outer_lexer, &MakeupEEx.dynamic_html_lexer/0)
 
     # First pass - lex the HEEx part and ignore the outside HTML
     {:ok, tokens, "", _, _, _} = root(text)
@@ -253,16 +277,30 @@ defmodule Makeup.Lexers.HEExLexer do
       |> postprocess([])
       |> ElixirLexer.postprocess([])
 
-    new_group_prefix = group_prefix <> "-out"
-    outer_opts = Keyword.put(opts, :group_prefix, new_group_prefix)
-
     # Second pass - Lex the outside HTML
-    all_tokens = Splicer.lex_outside(tokens, outer_lexer, outer_opts)
+    all_tokens =
+      case outer_lexer do
+        lexer when is_atom(lexer) ->
+          lex_outer(tokens, lexer, [], group_prefix)
+
+        {lexer, outer_opts} ->
+          lex_outer(tokens, lexer, outer_opts, group_prefix)
+
+        fun when is_function(outer_lexer, 0) ->
+          {lexer, outer_opts} = fun.()
+          lex_outer(tokens, lexer, outer_opts, group_prefix)
+      end
 
     # Apply the finishing touches
     all_tokens
     |> heex_postprocess()
     |> match_groups(group_prefix)
     |> ElixirLexer.match_groups(group_prefix <> "-ex")
+  end
+
+  defp lex_outer(tokens, outer_lexer, outer_opts, group_prefix) do
+    new_group_prefix = group_prefix <> "-out"
+    outer_opts = Keyword.put(outer_opts, :group_prefix, new_group_prefix)
+    Splicer.lex_outside(tokens, outer_lexer, outer_opts)
   end
 end
