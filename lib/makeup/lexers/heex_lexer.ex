@@ -162,8 +162,9 @@ defmodule Makeup.Lexers.HEExLexer do
   # other HTML Lexers (e.g. makeup_syntect) classify opening tags as :name_tag
   # Treat any tag name as possible HEEx component
   defp heex_postprocess([
-         {:name_tag, %{language: :html} = attrs, tag_name} | tokens
-       ]) do
+         {:name_tag, %{language: language} = attrs, tag_name} | tokens
+       ])
+       when language in [:html, "html"] do
     tag_tokens =
       case ElixirLexer.lex(tag_name) do
         # MyMod.function -> remote component
