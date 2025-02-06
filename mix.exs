@@ -1,7 +1,7 @@
 defmodule MakeupEEx.MixProject do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "2.0.0"
   @url "https://github.com/elixir-makeup/makeup_eex"
 
   def project do

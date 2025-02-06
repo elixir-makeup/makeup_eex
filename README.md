@@ -9,7 +9,7 @@ Add `makeup_eex` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:makeup_eex, "~> 1.0"}
+    {:makeup_eex, "~> 2.0"}
   ]
 end
 ```
