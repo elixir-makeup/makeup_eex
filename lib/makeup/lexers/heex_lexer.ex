@@ -1,6 +1,6 @@
 defmodule Makeup.Lexers.HEExLexer do
   @moduledoc """
-  HEEx lexer
+  HEEx lexer.
   """
 
   import NimbleParsec
@@ -38,9 +38,7 @@ defmodule Makeup.Lexers.HEExLexer do
       parsec({ElixirLexer, :root_element})
     ])
 
-  # Make this more strict!
-  # we're bound to get a number of false positives due to this.
-  # Actually, I should try to find a syntax reference for HEEx
+  # TODO: Make this more strict!
   text_outside_heex =
     times(
       lookahead_not(
@@ -127,40 +125,6 @@ defmodule Makeup.Lexers.HEExLexer do
 
   defp heex_postprocess([]), do: []
 
-  # makeup_html's HTMLLexer classifies any unknown tag names as "string".
-  # We customize this here to get a nicer highlighting.
-  defp heex_postprocess([
-         {:punctuation, %{language: :html}, open_or_close} = punctuation,
-         {:string, %{language: :html} = attrs, tag_name} | tokens
-       ])
-       when open_or_close in ["<", "</"] do
-    tag_tokens =
-      case ElixirLexer.lex(tag_name) do
-        # MyMod.function -> remote component
-        # we use the default formatting for a module + function from the
-        # Elixir lexer (-> :name_class + :operator + :name)
-        [{:name_class, _, _} | _rest] = tokens ->
-          tokens
-
-        # .function -> local component
-        [{:operator, _, "."} | _rest] ->
-          [{:name_function, attrs, tag_name}]
-
-        _ ->
-          # any other tag (HTML5 native tags are classified as :keyword by makeup_html)
-          # but let's just use it for any other tag as well (could be a CustomElement)
-          [{:keyword, attrs, tag_name}]
-      end
-
-    List.flatten([
-      punctuation,
-      tag_tokens
-      | heex_postprocess(tokens)
-    ])
-  end
-
-  # other HTML Lexers (e.g. makeup_syntect) classify opening tags as :name_tag
-  # Treat any tag name as possible HEEx component
   defp heex_postprocess([
          {:name_tag, %{language: language} = attrs, tag_name} | tokens
        ])
@@ -268,7 +232,9 @@ defmodule Makeup.Lexers.HEExLexer do
   @impl Makeup.Lexer
   def lex(text, opts \\ []) do
     group_prefix = Keyword.get(opts, :group_prefix, random_prefix(10))
-    outer_lexer = Keyword.get(opts, :outer_lexer, &MakeupEEx.dynamic_html_lexer/0)
+
+    outer_lexer =
+      Keyword.get(opts, :outer_lexer, &Makeup.Lexers.EExLexer.Application.dynamic_html_lexer/0)
 
     # First pass - lex the HEEx part and ignore the outside HTML
     {:ok, tokens, "", _, _, _} = root(text)

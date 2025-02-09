@@ -12,10 +12,10 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
     test "sanity check on the HTML lexer #1" do
       assert lex_html("<input></input>") == [
                {:punctuation, %{group_id: "group-out-1"}, "<"},
-               {:keyword, %{}, "input"},
+               {:name_tag, %{}, "input"},
                {:punctuation, %{group_id: "group-out-1"}, ">"},
                {:punctuation, %{group_id: "group-out-2"}, "</"},
-               {:keyword, %{}, "input"},
+               {:name_tag, %{}, "input"},
                {:punctuation, %{group_id: "group-out-2"}, ">"}
              ]
     end
@@ -23,10 +23,10 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
     test "sanity check on the HTML lexer #2" do
       assert lex_html("<span></span>") == [
                {:punctuation, %{group_id: "group-out-1"}, "<"},
-               {:keyword, %{}, "span"},
+               {:name_tag, %{}, "span"},
                {:punctuation, %{group_id: "group-out-1"}, ">"},
                {:punctuation, %{group_id: "group-out-2"}, "</"},
-               {:keyword, %{}, "span"},
+               {:name_tag, %{}, "span"},
                {:punctuation, %{group_id: "group-out-2"}, ">"}
              ]
     end
@@ -48,7 +48,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
     test "EEx inside tag" do
       assert lex_html_eex("<b><%= @username %></b>") == [
                {:punctuation, %{group_id: "group-out-1"}, "<"},
-               {:keyword, %{}, "b"},
+               {:name_tag, %{}, "b"},
                {:punctuation, %{group_id: "group-out-1"}, ">"},
                {:punctuation, %{group_id: "group-1"}, "<%="},
                {:whitespace, %{}, " "},
@@ -56,7 +56,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
                {:whitespace, %{}, " "},
                {:punctuation, %{group_id: "group-1"}, "%>"},
                {:punctuation, %{group_id: "group-out-2"}, "</"},
-               {:keyword, %{}, "b"},
+               {:name_tag, %{}, "b"},
                {:punctuation, %{group_id: "group-out-2"}, ">"}
              ]
     end
@@ -64,7 +64,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
     test "EEx inside attribute value (the EEx splits the string)" do
       assert lex_html_eex(~S[<span class="my-<%= @class %>">]) == [
                {:punctuation, %{group_id: "group-out-1"}, "<"},
-               {:keyword, %{}, "span"},
+               {:name_tag, %{}, "span"},
                {:whitespace, %{}, " "},
                {:name_attribute, %{}, "class"},
                {:operator, %{}, "="},
@@ -118,7 +118,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
                {:punctuation, %{group_id: "group-1"}, "%>"},
                {:whitespace, %{}, "\n  "},
                {:punctuation, %{group_id: "group-out-1"}, "<"},
-               {:keyword, %{}, "p"},
+               {:name_tag, %{}, "p"},
                {:punctuation, %{group_id: "group-out-1"}, ">"},
                {:string, %{}, "Some condition is true for user: "},
                {:punctuation, %{group_id: "group-2"}, "<%="},
@@ -127,7 +127,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
                {:whitespace, %{}, " "},
                {:punctuation, %{group_id: "group-2"}, "%>"},
                {:punctuation, %{group_id: "group-out-2"}, "</"},
-               {:keyword, %{}, "p"},
+               {:name_tag, %{}, "p"},
                {:punctuation, %{group_id: "group-out-2"}, ">"},
                {:string, %{}, "\n"},
                {:punctuation, %{group_id: "group-3"}, "<%"},
@@ -137,7 +137,7 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
                {:punctuation, %{group_id: "group-3"}, "%>"},
                {:string, %{}, "\n  "},
                {:punctuation, %{group_id: "group-out-3"}, "<"},
-               {:keyword, %{}, "p"},
+               {:name_tag, %{}, "p"},
                {:punctuation, %{group_id: "group-out-3"}, ">"},
                {:string, %{}, "Some condition is false for user: "},
                {:punctuation, %{group_id: "group-4"}, "<%="},
@@ -146,15 +146,15 @@ defmodule Makeup.Lexers.EExHtmlLexerTest do
                {:whitespace, %{}, " "},
                {:punctuation, %{group_id: "group-4"}, "%>"},
                {:punctuation, %{group_id: "group-out-4"}, "</"},
-               {:keyword, %{}, "p"},
+               {:name_tag, %{}, "p"},
                {:punctuation, %{group_id: "group-out-4"}, ">"},
-               {:whitespace, %{}, "\n"},
+               {:string, %{}, "\n"},
                {:punctuation, %{group_id: "group-5"}, "<%"},
                {:whitespace, %{}, " "},
                {:keyword, %{group_id: "group-ex-1"}, "end"},
                {:whitespace, %{}, " "},
                {:punctuation, %{group_id: "group-5"}, "%>"},
-               {:whitespace, %{}, "\n"}
+               {:string, %{}, "\n"}
              ]
     end
   end

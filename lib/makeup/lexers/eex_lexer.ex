@@ -1,6 +1,6 @@
 defmodule Makeup.Lexers.EExLexer do
   @moduledoc """
-  EEx lexer
+  EEx lexer.
   """
 
   import NimbleParsec

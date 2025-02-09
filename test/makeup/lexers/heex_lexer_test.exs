@@ -19,7 +19,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
   test "EEx inside tag" do
     assert lex_heex("<b><%= @username %></b>") == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},
-             {:keyword, %{}, "b"},
+             {:name_tag, %{}, "b"},
              {:punctuation, %{group_id: "group-out-1"}, ">"},
              {:punctuation, %{group_id: "group-1"}, "<%="},
              {:whitespace, %{}, " "},
@@ -27,7 +27,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:whitespace, %{}, " "},
              {:punctuation, %{group_id: "group-1"}, "%>"},
              {:punctuation, %{group_id: "group-out-2"}, "</"},
-             {:keyword, %{}, "b"},
+             {:name_tag, %{}, "b"},
              {:punctuation, %{group_id: "group-out-2"}, ">"}
            ]
   end
@@ -35,7 +35,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
   test "HEEx inside attribute value (the EEx splits the string)" do
     assert lex_heex(~S[<span class="my-<%= @class %>">]) == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},
-             {:keyword, %{}, "span"},
+             {:name_tag, %{}, "span"},
              {:whitespace, %{}, " "},
              {:name_attribute, %{}, "class"},
              {:operator, %{}, "="},
@@ -81,14 +81,14 @@ defmodule Makeup.Lexers.HEExLexerTest do
   test "HEEx with curly braces" do
     assert lex_heex("<b {@attrs}></b>") == [
              {:punctuation, %{group_id: "group-out-1"}, "<"},
-             {:keyword, %{}, "b"},
+             {:name_tag, %{}, "b"},
              {:whitespace, %{}, " "},
              {:punctuation, %{group_id: "group-1"}, "{"},
              {:name_attribute, %{}, "@attrs"},
              {:punctuation, %{group_id: "group-1"}, "}"},
              {:punctuation, %{group_id: "group-out-1"}, ">"},
              {:punctuation, %{group_id: "group-out-2"}, "</"},
-             {:keyword, %{}, "b"},
+             {:name_tag, %{}, "b"},
              {:punctuation, %{group_id: "group-out-2"}, ">"}
            ]
   end
@@ -125,13 +125,13 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:string_sigil, _, "~H\"\"\""},
              {:whitespace, _, "\n"},
              {:punctuation, _, "<"},
-             {:keyword, _, "div"},
+             {:name_tag, _, "div"},
              {:whitespace, _, " "},
              {:name_attribute, _, "class"},
              {:operator, _, "="},
              {:string, _, "\"foo\""},
              {:whitespace, _, " "},
-             {:string, _, "bar"},
+             {:name_attribute, _, "bar"},
              {:operator, _, "="},
              {:punctuation, _, "{"},
              {:name_attribute, _, "@baz"},
@@ -143,7 +143,7 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:operator, _, "."},
              {:name, _, "function"},
              {:whitespace, _, " "},
-             {:string, _, "attr"},
+             {:name_attribute, _, "attr"},
              {:operator, _, "="},
              {:string, _, "\"value\""},
              {:whitespace, _, " "},
@@ -152,15 +152,15 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:punctuation, _, "<"},
              {:name_function, _, ".local_component"},
              {:whitespace, _, " "},
-             {:string, _, "data-attr"},
+             {:name_attribute, _, "data-attr"},
              {:punctuation, _, ">"},
              {:string, _, "\n    "},
              {:punctuation, _, "<"},
-             {:keyword, _, ":myslot"},
+             {:string_symbol, _, ":myslot"},
              {:punctuation, _, ">"},
              {:string, _, "SlotContent"},
              {:punctuation, _, "</"},
-             {:keyword, _, ":myslot"},
+             {:string_symbol, _, ":myslot"},
              {:punctuation, _, ">"},
              {:string, _, "\n  "},
              {:punctuation, _, "</"},
@@ -168,9 +168,9 @@ defmodule Makeup.Lexers.HEExLexerTest do
              {:punctuation, _, ">"},
              {:string, _, "\n"},
              {:punctuation, _, "</"},
-             {:keyword, _, "div"},
+             {:name_tag, _, "div"},
              {:punctuation, _, ">"},
-             {:whitespace, _, "\n"},
+             {:string, _, "\n"},
              {:string_sigil, _, "\"\"\""},
              {:whitespace, _, "\n"}
            ] =
