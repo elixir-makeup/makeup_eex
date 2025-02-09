@@ -11,7 +11,7 @@ def deps do
   [
     {:makeup_eex, "~> 2.0"},
     # If using HEEx also add:
-    # {:makeup_html, "~> 0.1"}
+    # {:makeup_html, ">= 0.0.0"}
   ]
 end
 ```
